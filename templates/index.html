@@ -200,20 +200,6 @@
     </div>
 </div>
 
-<!-- 移动端连接指南部分 -->
-<div class="card mt-4 d-lg-none shadow-sm">
-    <div class="card-header bg-info text-white">
-        <h5 class="mb-0"><i class="bi bi-phone me-2"></i>移动设备连接</h5>
-    </div>
-    <div class="card-body">
-        <div class="alert alert-info">
-            <p class="mb-0"><i class="bi bi-info-circle me-2"></i>想在手机上使用本应用？点击下方按钮查看连接指南。</p>
-        </div>
-        <a href="{{ url_for('network_check') }}" class="btn btn-primary d-block">
-            <i class="bi bi-wifi me-2"></i>网络连接指南
-        </a>
-    </div>
-</div>
 {% endblock %}
 
 {% if logged_in %}

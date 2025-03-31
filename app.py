@@ -37,21 +37,12 @@ def favicon():
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # 添加一个诊断页面
-@app.route('/network-check')
-def network_check():
-    # 获取本机IP地址
-    import socket
-    hostname = socket.gethostname()
-    try:
-        # 获取本地IP地址
-        local_ip = socket.gethostbyname(hostname)
-    except:
-        local_ip = "无法获取"
-    
-    return render_template('network_check.html', 
-                          hostname=hostname,
-                          local_ip=local_ip,
-                          port=5000)
+@app.route('/')
+def index():
+    logged_in = 'username' in session
+    username = session.get('username', '')
+    update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return render_template('index.html', logged_in=logged_in, username=username, update_time=update_time)
 
 # 全局错误处理
 @app.errorhandler(404)
@@ -71,14 +62,6 @@ if not os.path.exists('data'):
 if not os.path.exists(app.config['USERS_FILE']):
     with open(app.config['USERS_FILE'], 'w') as f:
         json.dump([], f)
-
-# 主页
-@app.route('/')
-def index():
-    logged_in = 'username' in session
-    username = session.get('username', '')
-    update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    return render_template('index.html', logged_in=logged_in, username=username, update_time=update_time)
 
 # 清除指定账号外的所有用户（仅用于开发和测试阶段）
 @app.route('/admin/clear_users')
