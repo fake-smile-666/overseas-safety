@@ -87,7 +87,7 @@ def admin_reset_password(user_id):
         # 更新密码
         user_obj = User.from_dict(user)
         user_obj.set_password(new_password)
-        user.update(user_obj.to_set_password(new_password))
+        user.update(user_obj.to_dict())
         
         with open(app.config['USERS_FILE'], 'w', encoding='utf-8') as f:
             json.dump(users, f, ensure_ascii=False, indent=4)
