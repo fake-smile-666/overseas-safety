@@ -12,10 +12,154 @@ from logging.handlers import RotatingFileHandler
 from utils.risk_assessment import get_country_risk_level, get_safety_tips, get_countries
 from utils.emergency import get_emergency_contacts
 from models.user import User
+import csv
+from io import StringIO
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32)))
 app.config['USERS_FILE'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'users.json')
+
+# 管理员配置
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+ADMIN_KEY = os.environ.get('ADMIN_KEY', 'your-admin-key')
+
+# 管理员验证装饰器
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            flash('请先登录管理员账号')
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# 管理员登录
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        admin_key = request.form.get('admin_key')
+        
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD and admin_key == ADMIN_KEY:
+            session['admin_logged_in'] = True
+            app.logger.info('管理员登录成功')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            app.logger.warning(f'管理员登录失败，IP: {request.remote_addr}')
+            flash('登录失败，请检查输入')
+            return redirect(url_for('admin_login'))
+    
+    return render_template('admin/login.html')
+
+# 管理员退出
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    flash('已退出管理员账号')
+    return redirect(url_for('admin_login'))
+
+# 用户管理页面
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    with open(app.config['USERS_FILE'], 'r', encoding='utf-8') as f:
+        users = json.load(f)
+    return render_template('admin/users.html', users=users)
+
+# 重置用户密码
+@app.route('/admin/reset_password/<user_id>', methods=['POST'])
+@admin_required
+def admin_reset_password(user_id):
+    try:
+        with open(app.config['USERS_FILE'], 'r', encoding='utf-8') as f:
+            users = json.load(f)
+        
+        user = next((u for u in users if u['id'] == user_id), None)
+        if not user:
+            return jsonify({'success': False, 'message': '用户不存在'})
+        
+        # 生成新密码
+        new_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        
+        # 更新密码
+        user_obj = User.from_dict(user)
+        user_obj.set_password(new_password)
+        user.update(user_obj.to_set_password(new_password))
+        
+        with open(app.config['USERS_FILE'], 'w', encoding='utf-8') as f:
+            json.dump(users, f, ensure_ascii=False, indent=4)
+        
+        # TODO: 发送邮件给用户
+        app.logger.info(f'管理员重置了用户 {user["username"]} 的密码')
+        
+        return jsonify({
+            'success': True,
+            'message': f'密码已重置。新密码: {new_password}\n请尽快通知用户。'
+        })
+    
+    except Exception as e:
+        app.logger.error(f'重置密码失败: {str(e)}')
+        return jsonify({'success': False, 'message': '操作失败，请重试'})
+
+# 删除用户
+@app.route('/admin/delete_user/<user_id>', methods=['DELETE'])
+@admin_required
+def admin_delete_user(user_id):
+    try:
+        with open(app.config['USERS_FILE'], 'r', encoding='utf-8') as f:
+            users = json.load(f)
+        
+        users = [u for u in users if u['id'] != user_id]
+        
+        with open(app.config['USERS_FILE'], 'w', encoding='utf-8') as f:
+            json.dump(users, f, ensure_ascii=False, indent=4)
+        
+        app.logger.info(f'管理员删除了用户 ID: {user_id}')
+        return jsonify({'success': True, 'message': '用户已删除'})
+    
+    except Exception as e:
+        app.logger.error(f'删除用户失败: {str(e)}')
+        return jsonify({'success': False, 'message': '删除失败，请重试'})
+
+# 导出用户数据
+@app.route('/admin/export_users')
+@admin_required
+def admin_export_users():
+    try:
+        with open(app.config['USERS_FILE'], 'r', encoding='utf-8') as f:
+            users = json.load(f)
+        
+        # 创建CSV数据
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['ID', '用户名', '邮箱', '紧急联系人', '注册时间'])
+        
+        for user in users:
+            writer.writerow([
+                user['id'],
+                user['username'],
+                user['email'],
+                user['emergency_contact'],
+                user['created_at']
+            ])
+        
+        # 生成响应
+        output.seek(0)
+        return send_from_directory(
+            directory=os.path.dirname(app.config['USERS_FILE']),
+            path='users.csv',
+            as_attachment=True,
+            download_name=f'users_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv',
+            mimetype='text/csv'
+        )
+    
+    except Exception as e:
+        app.logger.error(f'导出用户数据失败: {str(e)}')
+        flash('导出失败，请重试')
+        return redirect(url_for('admin_users'))
 
 # 设置日志
 log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
@@ -389,6 +533,31 @@ def get_cities(country):
         return jsonify(cities)
     except Exception as e:
         return jsonify([])
+
+# 管理员仪表板
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+    try:
+        with open(app.config['USERS_FILE'], 'r', encoding='utf-8') as f:
+            users = json.load(f)
+        
+        # 获取统计数据
+        total_users = len(users)
+        # 这里简单模拟活跃用户数和紧急求助次数
+        active_users = len([u for u in users if u.get('last_login', '').startswith(datetime.now().strftime('%Y-%m-%d'))])
+        emergency_calls = 0  # 实际应用中需要从日志或数据库中获取
+        
+        return render_template('admin/dashboard.html',
+                             total_users=total_users,
+                             active_users=active_users,
+                             emergency_calls=emergency_calls,
+                             last_update=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    
+    except Exception as e:
+        app.logger.error(f'加载管理员仪表板失败: {str(e)}')
+        flash('加载仪表板数据失败')
+        return redirect(url_for('admin_login'))
 
 if __name__ == '__main__':
     # 确保数据目录存在
