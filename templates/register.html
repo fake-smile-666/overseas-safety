@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}注册 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">注册新账号</h4>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="post" action="{{ url_for('register') }}" id="registerForm" novalidate>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="invalid-feedback">请输入用户名</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">电子邮箱</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        <div class="invalid-feedback">请输入有效的邮箱地址</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">密码</label>
+                        <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                        <div class="invalid-feedback">密码长度至少为8位</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="emergency_contact" class="form-label">紧急联系人电话</label>
+                        <input type="tel" class="form-control" id="emergency_contact" name="emergency_contact" required>
+                        <div class="invalid-feedback">请输入紧急联系人电话</div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">注册</button>
+                    </div>
+                </form>
+                <div class="mt-3 text-center">
+                    <p>已有账号？ <a href="{{ url_for('login') }}">立即登录</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    // 重置表单验证状态
+    this.classList.remove('was-validated');
+    
+    // 获取表单元素
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const emergency_contact = document.getElementById('emergency_contact');
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    // 验证所有字段
+    let isValid = true;
+    
+    if (!username.value.trim()) {
+        username.classList.add('is-invalid');
+        isValid = false;
+        e.preventDefault();
+    }
+    
+    if (!email.value.trim() || !email.value.includes('@') || !email.value.includes('.')) {
+        email.classList.add('is-invalid');
+        isValid = false;
+        e.preventDefault();
+    }
+    
+    if (!password.value || password.value.length < 8) {
+        password.classList.add('is-invalid');
+        isValid = false;
+        e.preventDefault();
+    }
+    
+    if (!emergency_contact.value.trim()) {
+        emergency_contact.classList.add('is-invalid');
+        isValid = false;
+        e.preventDefault();
+    }
+    
+    if (!isValid) {
+        this.classList.add('was-validated');
+        // 重置提交按钮状态
+        submitButton.disabled = false;
+        submitButton.innerHTML = '注册';
+        return false;
+    }
+    
+    // 如果验证通过，禁用提交按钮防止重复提交
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 提交中...';
+    
+    // 允许表单提交
+    return true;
+});
+
+// 实时验证
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+        document.getElementById('registerForm').classList.remove('was-validated');
+        // 重置提交按钮状态
+        const submitButton = document.querySelector('button[type="submit"]');
+        submitButton.disabled = false;
+        submitButton.innerHTML = '注册';
+    });
+});
+</script>
+{% endblock %} 

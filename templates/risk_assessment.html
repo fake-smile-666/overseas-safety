@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}风险评估 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">目的地风险评估</h2>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="riskForm">
+                        <div class="mb-3">
+                            <label for="country" class="form-label">选择国家</label>
+                            <select class="form-select" id="country" name="country" required>
+                                <option value="">请选择国家</option>
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">选择城市</label>
+                            <select class="form-select" id="city" name="city" required>
+                                <option value="">请先选择国家</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="season" class="form-label">选择季节</label>
+                            <select class="form-select" id="season" name="season" required>
+                                <option value="">请选择季节</option>
+                                <option value="spring">春季</option>
+                                <option value="summer">夏季</option>
+                                <option value="autumn">秋季</option>
+                                <option value="winter">冬季</option>
+                            </select>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">评估风险</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if risk_level %}
+    <div class="row mt-4">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">风险评估结果</h3>
+                    
+                    <!-- 国家风险评估 -->
+                    <div class="mb-4">
+                        <h4 class="text-center mb-3">{{ country }}总体风险评估</h4>
+                        <div class="progress mb-3" style="height: 25px;">
+                            <div class="progress-bar {% if risk_level.overall <= 2 %}bg-success{% elif risk_level.overall <= 3 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ (risk_level.overall / 5) * 100 }}%">
+                                风险等级: {{ risk_level.overall }}/5
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>详细风险分类</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        犯罪风险
+                                        <span class="badge {% if risk_level.crime <= 2 %}bg-success{% elif risk_level.crime <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ risk_level.crime }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        恐怖主义风险
+                                        <span class="badge {% if risk_level.terrorism <= 2 %}bg-success{% elif risk_level.terrorism <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ risk_level.terrorism }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        健康风险
+                                        <span class="badge {% if risk_level.health <= 2 %}bg-success{% elif risk_level.health <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ risk_level.health }}/5
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>其他风险因素</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        自然灾害风险
+                                        <span class="badge {% if risk_level.natural_disaster <= 2 %}bg-success{% elif risk_level.natural_disaster <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ risk_level.natural_disaster }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        交通风险
+                                        <span class="badge {% if risk_level.transportation <= 2 %}bg-success{% elif risk_level.transportation <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ risk_level.transportation }}/5
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 城市风险评估 -->
+                    {% if city_risk %}
+                    <div class="mb-4">
+                        <h4 class="text-center mb-3">{{ city }}城市风险评估</h4>
+                        <div class="progress mb-3" style="height: 25px;">
+                            <div class="progress-bar {% if city_risk.overall <= 2 %}bg-success{% elif city_risk.overall <= 3 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ (city_risk.overall / 5) * 100 }}%">
+                                风险等级: {{ city_risk.overall }}/5
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>详细风险分类</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        犯罪风险
+                                        <span class="badge {% if city_risk.crime <= 2 %}bg-success{% elif city_risk.crime <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ city_risk.crime }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        恐怖主义风险
+                                        <span class="badge {% if city_risk.terrorism <= 2 %}bg-success{% elif city_risk.terrorism <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ city_risk.terrorism }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        健康风险
+                                        <span class="badge {% if city_risk.health <= 2 %}bg-success{% elif city_risk.health <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ city_risk.health }}/5
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>其他风险因素</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        自然灾害风险
+                                        <span class="badge {% if city_risk.natural_disaster <= 2 %}bg-success{% elif city_risk.natural_disaster <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ city_risk.natural_disaster }}/5
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        交通风险
+                                        <span class="badge {% if city_risk.transportation <= 2 %}bg-success{% elif city_risk.transportation <= 3 %}bg-warning{% else %}bg-danger{% endif %} rounded-pill">
+                                            {{ city_risk.transportation }}/5
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <h4 class="text-center mb-3">安全建议</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>一般建议</h5>
+                                <ul class="list-group">
+                                    {% for tip in safety_tips.general %}
+                                    <li class="list-group-item">{{ tip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>特定风险建议</h5>
+                                <ul class="list-group">
+                                    {% for tip in safety_tips.specific %}
+                                    <li class="list-group-item">{{ tip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// 页面加载时根据当前国家加载城市
+document.addEventListener('DOMContentLoaded', function() {
+    const country = document.getElementById('country').value;
+    if(country) {
+        const event = new Event('change');
+        document.getElementById('country').dispatchEvent(event);
+    }
+});
+
+document.getElementById('country').addEventListener('change', function() {
+    const country = this.value;
+    const citySelect = document.getElementById('city');
+    
+    // 清空城市选项
+    citySelect.innerHTML = '<option value="">请选择城市</option>';
+    
+    if (country) {
+        // 获取该国家的城市列表
+        fetch(`/get_cities/${country}`)
+            .then(response => response.json())
+            .then(cities => {
+                if(cities && cities.length > 0) {
+                    cities.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city;
+                        option.textContent = city;
+                        citySelect.appendChild(option);
+                    });
+                    // 如果只有一个城市，自动选择
+                    if(cities.length === 1) {
+                        citySelect.value = cities[0];
+                    }
+                } else {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "该国家暂无城市数据";
+                    citySelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('获取城市数据错误:', error);
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "获取城市失败";
+                citySelect.appendChild(option);
+            });
+    }
+});
+
+// 提高表单交互性
+document.getElementById('city').addEventListener('change', function() {
+    // 如果已选择国家和城市，可以启用季节选择
+    if(this.value) {
+        document.getElementById('season').focus();
+    }
+});
+</script>
+{% endblock %} 

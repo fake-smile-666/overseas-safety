@@ -1,0 +1,267 @@
+/* 海外安全助手 - 移动端适配样式 */
+
+/* 全局移动端样式 */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* 适配iOS刘海屏 */
+.navbar {
+  padding-top: calc(0.5rem + var(--safe-area-inset-top));
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: white;
+}
+
+.footer {
+  padding-bottom: calc(1rem + var(--safe-area-inset-bottom));
+  background-color: #f8f9fa;
+}
+
+/* 增强触摸体验 */
+button, .btn, a.nav-link, .emergency-btn {
+  min-height: 44px; /* 符合iOS最小触摸区域标准 */
+  padding: 0.75rem 1rem;
+  touch-action: manipulation;
+}
+
+/* 紧急按钮优化 */
+.emergency-btn {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  box-shadow: 0 0.25rem 0.5rem rgba(220, 53, 69, 0.4);
+  position: fixed;
+  bottom: calc(1.5rem + var(--safe-area-inset-bottom));
+  right: 1.5rem;
+  z-index: 1000;
+}
+
+/* 自适应表单元素 */
+input, select, textarea {
+  font-size: 16px !important; /* 防止iOS中输入时页面自动缩放 */
+}
+
+/* 修复地图容器在移动端的显示 */
+.map-container {
+  height: 70vh;
+  max-height: 400px;
+  width: 100%;
+}
+
+/* 移动端导航优化 */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+.mobile-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.mobile-bottom-nav-item.active {
+  color: #0d6efd;
+}
+
+.mobile-bottom-nav-icon {
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+}
+
+/* 移动端内容区域优化 */
+.mobile-content {
+  padding-bottom: 70px; /* 为底部导航留出空间 */
+  margin-bottom: 60px; /* 为底部导航栏留出空间 */
+}
+
+/* 下拉刷新指示器 */
+.pull-to-refresh {
+  position: fixed;
+  top: -60px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  transition: transform 0.3s ease;
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+  
+  .mobile-bottom-nav-item {
+    font-size: 0.7rem;
+  }
+  
+  .mobile-bottom-nav-icon {
+    font-size: 1.1rem;
+  }
+}
+
+/* 移除深色模式适配 */
+
+/* 移动端样式优化 */
+
+/* 基础样式 */
+body {
+    padding-bottom: 60px; /* 为底部导航栏留出空间 */
+}
+
+/* 导航栏样式 */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 内容区域样式 */
+.mobile-content {
+    margin-bottom: 60px; /* 为底部导航栏留出空间 */
+}
+
+/* 底部导航栏样式 */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.mobile-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+.mobile-bottom-nav-item.active {
+    color: #0d6efd;
+}
+
+.mobile-bottom-nav-icon {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+}
+
+/* 紧急按钮样式 */
+.emergency-btn {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+/* 表单样式优化 */
+.form-control {
+    font-size: 16px; /* 防止iOS自动缩放 */
+}
+
+/* 按钮样式优化 */
+.btn {
+    padding: 8px 16px;
+    font-size: 16px;
+}
+
+/* 卡片样式优化 */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+}
+
+/* 列表样式优化 */
+.list-group-item {
+    padding: 12px 16px;
+}
+
+/* 图片加载动画 */
+img {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+img.loaded {
+    opacity: 1;
+}
+
+/* iOS状态栏适配 */
+.ios-standalone {
+    padding-top: env(safe-area-inset-top);
+}
+
+/* 下拉刷新样式 */
+.pull-to-refresh {
+    position: fixed;
+    top: -60px;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    transition: transform 0.3s ease;
+} 

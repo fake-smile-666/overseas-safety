@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}个人资料 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0"><i class="bi bi-person-circle me-2"></i>个人资料</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-3 text-center">
+                        <div class="profile-avatar mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 5rem; color: #0d6efd;"></i>
+                        </div>
+                        <h4>{{ user.username }}</h4>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="mb-3">
+                            <h5><i class="bi bi-envelope me-2"></i>邮箱</h5>
+                            <p class="lead">{{ user.email }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5><i class="bi bi-telephone me-2"></i>紧急联系人</h5>
+                            <p class="lead">{{ user.emergency_contact }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h5><i class="bi bi-calendar me-2"></i>注册时间</h5>
+                            <p class="lead">{{ user.created_at if user.created_at else '未知' }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>返回首页
+                    </a>
+                    <!-- 将来可以添加编辑个人资料按钮 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

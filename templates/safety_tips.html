@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}安全提示 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-info-circle-fill"></i> 海外安全提示</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-shield-check text-primary" style="font-size: 4rem;"></i>
+                    <h3 class="mt-2">安全提示与建议</h3>
+                </div>
+                
+                <div class="alert alert-info">
+                    <p class="mb-0">以下是一些通用的海外安全提示，帮助您在国外保持安全。请根据您所在地区的具体情况，采取相应的安全措施。</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="list-group" id="list-tab" role="tablist">
+                            {% for category, tip_list in tips.items() %}
+                                <a class="list-group-item list-group-item-action {% if loop.first %}active{% endif %}" 
+                                   id="list-{{ category }}-list" 
+                                   data-bs-toggle="list" 
+                                   href="#list-{{ category }}" 
+                                   role="tab" 
+                                   aria-controls="{{ category }}">
+                                    {{ category }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="tab-content" id="nav-tabContent">
+                            {% for category, tip_list in tips.items() %}
+                                <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                                     id="list-{{ category }}" 
+                                     role="tabpanel" 
+                                     aria-labelledby="list-{{ category }}-list">
+                                    
+                                    <div class="row mb-4">
+                                        <div class="col-md-4 text-center">
+                                            {% if category == "个人安全" %}
+                                                <i class="bi bi-person-badge text-danger" style="font-size: 4rem;"></i>
+                                            {% elif category == "交通安全" %}
+                                                <i class="bi bi-truck text-warning" style="font-size: 4rem;"></i>
+                                            {% elif category == "住宿安全" %}
+                                                <i class="bi bi-house-door-fill text-success" style="font-size: 4rem;"></i>
+                                            {% elif category == "网络安全" %}
+                                                <i class="bi bi-wifi text-info" style="font-size: 4rem;"></i>
+                                            {% else %}
+                                                <i class="bi bi-check-circle-fill text-primary" style="font-size: 4rem;"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h4>{{ category }}提示</h4>
+                                            <p>以下是一些关于{{ category }}的重要提示，请认真阅读并遵守：</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <ul class="list-group list-group-flush">
+                                        {% for tip in tip_list %}
+                                            <li class="list-group-item">
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i> {{ tip }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> 紧急情况处理建议</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="emergencyAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                遭遇抢劫或偷盗
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#emergencyAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 保持冷静，不要抵抗，人身安全第一</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 尽量记住对方特征</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 及时向当地警方报案</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 联系中国使领馆寻求协助</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 如证件丢失，立即办理挂失和补办手续</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                突发疾病或意外受伤
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#emergencyAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 立即拨打当地急救电话</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 告知周围人员自己的情况，寻求帮助</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 联系家人或紧急联系人</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 保留所有医疗单据，以备保险理赔</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 如有需要，联系使领馆寻求协助</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                自然灾害
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#emergencyAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 关注当地媒体和政府的紧急通知</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 按照当地应急指引行动</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 尽快前往安全地带或避难所</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 与家人和使领馆保持联络</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 准备必要的紧急物资（食物、水、药品等）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                证件丢失
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#emergencyAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 立即向当地警方报案并索取报案证明</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 联系中国使领馆申请旅行证或补发护照</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 通知银行冻结丢失的银行卡</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 准备身份证明材料（如护照复印件）</li>
+                                    <li><i class="bi bi-arrow-right-circle text-primary me-2"></i> 联系家人寻求帮助</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-lightbulb-fill"></i> 实用安全小贴士</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-file-earmark-text text-primary" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">重要证件保管</h5>
+                                <p class="card-text">将护照、签证等重要证件复印并存储电子版，原件妥善保管。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-telephone-plus-fill text-danger" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">紧急联系方式</h5>
+                                <p class="card-text">随身携带紧急联系人信息，包括当地使领馆联系方式。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-compass text-success" style="font-size: 3rem;"></i>
+                                <h5 class="card-title mt-3">导航与定位</h5>
+                                <p class="card-text">使用可靠的导航应用，提前下载离线地图，避免迷路。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

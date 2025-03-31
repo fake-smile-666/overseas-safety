@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}服务器错误 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="mt-5 mb-5">
+            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 5rem;"></i>
+            <h1 class="mt-3">500 - 服务器错误</h1>
+            <p class="lead">抱歉，服务器发生了错误。请稍后再试。</p>
+            <div class="mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="bi bi-house"></i> 返回首页
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

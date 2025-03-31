@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if logged_in %}控制面板{% else %}首页{% endif %} - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- 在顶部添加更新时间显示 -->
+        <div class="alert alert-info mb-3">
+            <small class="text-muted">最后更新时间：{{ update_time }}</small>
+        </div>
+        
+        {% if not logged_in %}
+        <!-- 未登录用户显示欢迎页面 -->
+        <div class="jumbotron text-center p-5 mb-4 rounded-3 welcome-jumbotron">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">海外安全助手</h1>
+                <p class="fs-4">为海外留学生和旅行者提供全方位安全保障</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-2">立即注册</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">登录</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 未登录用户显示功能介绍 -->
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-exclamation text-danger" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-3">风险评估</h5>
+                        <p class="card-text">根据目的地的实时数据，评估您的旅行安全风险，提供针对性安全建议。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-telephone-fill text-success" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-3">紧急联系</h5>
+                        <p class="card-text">一键获取当地紧急联系电话、使领馆联系方式，快速联系您的紧急联系人。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-map-fill text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-3">安全地图</h5>
+                        <p class="card-text">查看周围安全设施位置，包括警察局、医院、使领馆等，并提供离线导航功能。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">为什么选择海外安全助手？</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex">
+                                <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 1.2rem;"></i>
+                                <div>
+                                    <strong>本地运行，无需联网</strong>
+                                    <p class="text-muted mb-0">关键功能可以离线使用，确保在任何情况下都能获取帮助</p>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex">
+                                <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 1.2rem;"></i>
+                                <div>
+                                    <strong>针对中国公民设计</strong>
+                                    <p class="text-muted mb-0">专门针对海外中国公民常见安全问题提供解决方案</p>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex">
+                                <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 1.2rem;"></i>
+                                <div>
+                                    <strong>简单易用</strong>
+                                    <p class="text-muted mb-0">界面直观，操作简单，紧急情况下能够快速获取帮助</p>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex">
+                                <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 1.2rem;"></i>
+                                <div>
+                                    <strong>隐私保护</strong>
+                                    <p class="text-muted mb-0">所有个人信息仅存储在本地，确保您的隐私安全</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- 已登录用户显示控制面板 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-primary">
+                    <h4 class="alert-heading"><i class="bi bi-person-circle"></i> 欢迎回来，{{ username }}！</h4>
+                    <p>请选择您需要的功能来保障您的海外安全。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-exclamation text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">风险评估</h5>
+                        <p class="card-text">评估您目的地的安全风险，获取针对性的安全建议。</p>
+                        <a href="{{ url_for('risk_assessment') }}" class="btn btn-primary mt-3">立即评估</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-telephone-fill text-success" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">紧急联系</h5>
+                        <p class="card-text">查看紧急联系人信息，一键拨打紧急电话。</p>
+                        <a href="{{ url_for('emergency_contacts') }}" class="btn btn-success mt-3">紧急联系</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-map-fill text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">安全地图</h5>
+                        <p class="card-text">查看附近的安全点位置，包括警察局、医院、使领馆等。</p>
+                        <a href="{{ url_for('safety_map') }}" class="btn btn-info mt-3 text-white">查看地图</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-info-circle-fill text-warning" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">安全提示</h5>
+                        <p class="card-text">获取海外安全的一般提示和建议，提高安全意识。</p>
+                        <a href="{{ url_for('safety_tips') }}" class="btn btn-warning mt-3 text-dark">安全提示</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-check text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="card-title mt-3">一键紧急求助</h5>
+                        <p class="card-text">紧急情况下，一键发送您的位置信息给紧急联系人。</p>
+                        <button type="button" class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#emergencyModal">
+                            <i class="bi bi-exclamation-triangle-fill"></i> 紧急求助
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 紧急求助模态框 -->
+        <div class="modal fade" id="emergencyModal" tabindex="-1" aria-labelledby="emergencyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="emergencyModalLabel">紧急求助</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="fw-bold">您确定要发送紧急求助吗？</p>
+                        <p>点击确认后，系统将：</p>
+                        <ul>
+                            <li>获取您当前的位置信息</li>
+                            <li>向您的紧急联系人发送求助信息和位置</li>
+                            <li>显示附近的安全点位置</li>
+                        </ul>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="includeLocation">
+                            <label class="form-check-label" for="includeLocation">
+                                我同意分享我的位置信息
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-danger" id="sendEmergencyBtn" disabled>
+                            <i class="bi bi-exclamation-triangle-fill"></i> 确认发送紧急求助
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 移动端连接指南部分 -->
+<div class="card mt-4 d-lg-none shadow-sm">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="bi bi-phone me-2"></i>移动设备连接</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <p class="mb-0"><i class="bi bi-info-circle me-2"></i>想在手机上使用本应用？点击下方按钮查看连接指南。</p>
+        </div>
+        <a href="{{ url_for('network_check') }}" class="btn btn-primary d-block">
+            <i class="bi bi-wifi me-2"></i>网络连接指南
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% if logged_in %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const includeLocationCheckbox = document.getElementById('includeLocation');
+    const sendEmergencyBtn = document.getElementById('sendEmergencyBtn');
+    
+    if (includeLocationCheckbox && sendEmergencyBtn) {
+        includeLocationCheckbox.addEventListener('change', function() {
+            sendEmergencyBtn.disabled = !this.checked;
+        });
+        
+        sendEmergencyBtn.addEventListener('click', function() {
+            // 获取位置信息
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    // 这里只是模拟发送求助信息
+                    alert('紧急求助信息已发送！\n位置信息: 纬度 ' + latitude + '，经度 ' + longitude);
+                    
+                    // 关闭模态框
+                    const emergencyModal = document.getElementById('emergencyModal');
+                    if (emergencyModal) {
+                        const bootstrapModal = bootstrap.Modal.getInstance(emergencyModal);
+                        if (bootstrapModal) {
+                            bootstrapModal.hide();
+                        }
+                    }
+                    
+                    // 跳转到安全地图
+                    window.location.href = '{{ url_for("safety_map") }}';
+                }, function() {
+                    alert('无法获取您的位置信息，但求助信息已发送！');
+                    const emergencyModal = document.getElementById('emergencyModal');
+                    if (emergencyModal) {
+                        const bootstrapModal = bootstrap.Modal.getInstance(emergencyModal);
+                        if (bootstrapModal) {
+                            bootstrapModal.hide();
+                        }
+                    }
+                });
+            } else {
+                alert('您的浏览器不支持位置信息获取，但求助信息已发送！');
+                const emergencyModal = document.getElementById('emergencyModal');
+                if (emergencyModal) {
+                    const bootstrapModal = bootstrap.Modal.getInstance(emergencyModal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endif %} 

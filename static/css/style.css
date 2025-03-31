@@ -1,0 +1,147 @@
+/* 海外安全助手 CSS 样式 */
+
+/* 全局样式 */
+body {
+    font-family: "Microsoft YaHei", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* 欢迎页面样式 */
+.welcome-jumbotron {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/images/20221026072331890.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    color: white;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* 卡片样式 */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border-radius: 0.5rem;
+    border: none;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+}
+
+/* 紧急按钮样式 */
+.emergency-btn {
+    padding: 1rem;
+    font-size: 1.25rem;
+    border-radius: 50%;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0.5rem 1rem rgba(220, 53, 69, 0.3);
+    transition: all 0.3s ease;
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+}
+
+.emergency-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0.75rem 1.5rem rgba(220, 53, 69, 0.4);
+}
+
+/* 风险等级指示器 */
+.risk-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.risk-level {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.risk-low {
+    background-color: #28a745;
+}
+
+.risk-medium {
+    background-color: #ffc107;
+}
+
+.risk-high {
+    background-color: #dc3545;
+}
+
+/* 地图容器 */
+.map-container {
+    height: 400px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+/* 提示卡片悬停效果 */
+.tip-card {
+    transition: transform 0.3s ease;
+}
+
+.tip-card:hover {
+    transform: translateY(-5px);
+}
+
+/* 移动端导航栏 */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    display: flex;
+    padding: 0.5rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.mobile-bottom-nav-item.active {
+    color: #0d6efd;
+}
+
+.mobile-bottom-nav-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .emergency-btn {
+        width: 4rem;
+        height: 4rem;
+        font-size: 1rem;
+        bottom: 5rem;
+    }
+    
+    .mobile-content {
+        padding-bottom: 4rem;
+    }
+} 

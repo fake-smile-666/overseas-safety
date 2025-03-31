@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}紧急联系人 - 海外安全助手{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-telephone-fill"></i> 紧急联系人</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle-fill"></i> 紧急情况下，请优先联系当地紧急服务。
+                </div>
+                
+                <div class="mb-4">
+                    <h5>您的紧急联系人</h5>
+                    <div class="card">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">主要联系人</h6>
+                                <p class="mb-0 text-primary">{{ personal_contact }}</p>
+                            </div>
+                            <a href="tel:{{ personal_contact }}" class="btn btn-primary">
+                                <i class="bi bi-telephone-fill"></i> 拨打
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion" id="emergencyAccordion">
+            {% for country, contacts in local_emergency.items() %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="{{ 'true' if loop.first else 'false' }}" aria-controls="collapse{{ loop.index }}">
+                        {{ country }}紧急联系方式
+                    </button>
+                </h2>
+                <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#emergencyAccordion">
+                    <div class="accordion-body">
+                        <div class="list-group">
+                            {% for service, number in contacts.items() %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">{{ service }}</h6>
+                                        <p class="mb-0 text-primary">{{ number }}</p>
+                                    </div>
+                                    <a href="tel:{{ number }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-telephone-fill"></i> 拨打
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">紧急联系提示</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        拨打紧急电话时，应简明扼要地说明情况
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        尽可能提供准确的位置信息
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        如不会当地语言，可以说"Chinese"请求中文服务或翻译
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        联系使领馆时，应准备好护照号码和个人信息
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

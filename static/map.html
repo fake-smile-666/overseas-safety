@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_8f1385f46e470e44d5de4c479f2ffec9 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_8f1385f46e470e44d5de4c479f2ffec9" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_8f1385f46e470e44d5de4c479f2ffec9 = L.map(
+                "map_8f1385f46e470e44d5de4c479f2ffec9",
+                {
+                    center: [40.7128, -74.006],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_fe49ecf99c38a081c626a9c6b2c06e01 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_fe49ecf99c38a081c626a9c6b2c06e01.addTo(map_8f1385f46e470e44d5de4c479f2ffec9);
+        
+    
+            var marker_9035c6c8142060c7328ef799d62ae386 = L.marker(
+                [40.7128, -74.009],
+                {
+}
+            ).addTo(map_8f1385f46e470e44d5de4c479f2ffec9);
+        
+    
+            var icon_9ed7ee96af834835a210d8f40bb129ea = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ced1c30298dcb87e70b6c1cc7a28cb3d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b32e1219686338c6b6dad5de5857e69a = $(`<div id="html_b32e1219686338c6b6dad5de5857e69a" style="width: 100.0%; height: 100.0%;">警察局</div>`)[0];
+                popup_ced1c30298dcb87e70b6c1cc7a28cb3d.setContent(html_b32e1219686338c6b6dad5de5857e69a);
+            
+        
+
+        marker_9035c6c8142060c7328ef799d62ae386.bindPopup(popup_ced1c30298dcb87e70b6c1cc7a28cb3d)
+        ;
+
+        
+    
+    
+                marker_9035c6c8142060c7328ef799d62ae386.setIcon(icon_9ed7ee96af834835a210d8f40bb129ea);
+            
+    
+            var marker_47bf123d8ebabe002cb0400117c999f5 = L.marker(
+                [40.7135, -74.007],
+                {
+}
+            ).addTo(map_8f1385f46e470e44d5de4c479f2ffec9);
+        
+    
+            var icon_976368bcf0a966e2c796f38dda566e5a = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_fef2c6d65954282b3228202e15340c09 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a5d7c0f6e702ba50a09a4903aca8d6cb = $(`<div id="html_a5d7c0f6e702ba50a09a4903aca8d6cb" style="width: 100.0%; height: 100.0%;">医院</div>`)[0];
+                popup_fef2c6d65954282b3228202e15340c09.setContent(html_a5d7c0f6e702ba50a09a4903aca8d6cb);
+            
+        
+
+        marker_47bf123d8ebabe002cb0400117c999f5.bindPopup(popup_fef2c6d65954282b3228202e15340c09)
+        ;
+
+        
+    
+    
+                marker_47bf123d8ebabe002cb0400117c999f5.setIcon(icon_976368bcf0a966e2c796f38dda566e5a);
+            
+    
+            var marker_83cb7594255e78f358b83ae920d29eca = L.marker(
+                [40.714, -74.005],
+                {
+}
+            ).addTo(map_8f1385f46e470e44d5de4c479f2ffec9);
+        
+    
+            var icon_1700f8f22cb3933bb9fd6d61d956f98c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "purple",
+  "iconColor": "white",
+  "icon": "info-sign",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_aa7b47e4000d8e305ae692640b61a74d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b447ac19d956213a43ed34f104667e95 = $(`<div id="html_b447ac19d956213a43ed34f104667e95" style="width: 100.0%; height: 100.0%;">使领馆</div>`)[0];
+                popup_aa7b47e4000d8e305ae692640b61a74d.setContent(html_b447ac19d956213a43ed34f104667e95);
+            
+        
+
+        marker_83cb7594255e78f358b83ae920d29eca.bindPopup(popup_aa7b47e4000d8e305ae692640b61a74d)
+        ;
+
+        
+    
+    
+                marker_83cb7594255e78f358b83ae920d29eca.setIcon(icon_1700f8f22cb3933bb9fd6d61d956f98c);
+            
+</script>
+</html>

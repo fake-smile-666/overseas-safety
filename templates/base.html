@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}海外安全助手{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-shield-check"></i> 海外安全助手
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">首页</a>
+                    </li>
+                    {% if session.get('user_id') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('risk_assessment') }}">风险评估</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('emergency_contacts') }}">紧急联系</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('safety_map') }}">安全地图</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('safety_tips') }}">安全提示</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if session.get('user_id') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('profile') }}">个人资料</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">退出</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">登录</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('register') }}">注册</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-3 mobile-content">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    {% if session.get('user_id') %}
+    <nav class="mobile-bottom-nav d-lg-none">
+        <a href="{{ url_for('index') }}" class="mobile-bottom-nav-item {% if request.endpoint == 'index' %}active{% endif %}">
+            <i class="bi bi-house-door mobile-bottom-nav-icon"></i>
+            <span>首页</span>
+        </a>
+        <a href="{{ url_for('risk_assessment') }}" class="mobile-bottom-nav-item {% if request.endpoint == 'risk_assessment' %}active{% endif %}">
+            <i class="bi bi-shield-exclamation mobile-bottom-nav-icon"></i>
+            <span>风险评估</span>
+        </a>
+        <a href="{{ url_for('emergency_contacts') }}" class="mobile-bottom-nav-item {% if request.endpoint == 'emergency_contacts' %}active{% endif %}">
+            <i class="bi bi-telephone mobile-bottom-nav-icon"></i>
+            <span>紧急联系</span>
+        </a>
+        <a href="{{ url_for('safety_map') }}" class="mobile-bottom-nav-item {% if request.endpoint == 'safety_map' %}active{% endif %}">
+            <i class="bi bi-geo-alt mobile-bottom-nav-icon"></i>
+            <span>安全地图</span>
+        </a>
+        <a href="{{ url_for('safety_tips') }}" class="mobile-bottom-nav-item {% if request.endpoint == 'safety_tips' %}active{% endif %}">
+            <i class="bi bi-lightbulb mobile-bottom-nav-icon"></i>
+            <span>安全提示</span>
+        </a>
+    </nav>
+    {% endif %}
+
+    {% if session.get('user_id') %}
+    <a href="tel:911" class="emergency-btn btn btn-danger">
+        <i class="bi bi-telephone-fill"></i>
+    </a>
+    {% endif %}
+
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">海外安全助手 &copy; <span id="currentYear"></span> | 为海外中国公民提供安全保障</span>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/mobile.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

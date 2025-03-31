@@ -1,0 +1,893 @@
+{% extends 'base.html' %}
+
+{% block title %}安全地图 - 海外安全助手{% endblock %}
+
+{% block extra_css %}
+<!-- 添加 Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        color: white;
+        padding: 24px 0;
+        margin-bottom: 38.8px; /* 24 * 1.618 ≈ 38.8 */
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 38.8px; /* 24 * 1.618 ≈ 38.8 */
+        font-weight: 700;
+        margin-bottom: 14.8px; /* 24 / 1.618 ≈ 14.8 */
+        display: inline-flex;
+        align-items: center;
+        gap: 14.8px; /* 24 / 1.618 ≈ 14.8 */
+        justify-content: center;
+    }
+    
+    .page-header h1 i {
+        font-size: 24px; /* 基准大小 */
+    }
+    
+    .page-header p {
+        font-size: 14.8px; /* 24 / 1.618 ≈ 14.8 */
+        opacity: 0.9;
+        margin: 0 auto;
+        max-width: 600px;
+    }
+    
+    .page-header .container {
+        position: relative;
+    }
+    
+    .page-header::before {
+        display: none;
+    }
+
+    #mapContainer {
+        height: 742.4px; /* 371.2 * 2 */
+        width: 100%;
+        border-radius: 12px;
+        position: relative;
+        background-color: #ffffff;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        margin-bottom: 38.8px; /* 保持黄金分割比的间距 */
+    }
+    
+    #onlineMap {
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+    
+    .map-grid {
+        background-image: linear-gradient(#e0e0e0 1px, transparent 1px),
+                         linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+        background-size: 50px 50px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform-origin: center;
+        opacity: 0.6;
+    }
+    
+    .location-marker {
+        position: absolute;
+        width: 40px; /* 增加标记大小 */
+        height: 40px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10;
+        border: 3px solid white;
+        transition: all 0.3s ease;
+    }
+    
+    .location-marker:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    
+    .police-marker {
+        background-color: #2ecc71;
+    }
+    
+    .hospital-marker {
+        background-color: #e74c3c;
+    }
+    
+    .embassy-marker {
+        background-color: #9b59b6;
+    }
+    
+    .user-marker {
+        background-color: #3498db;
+    }
+    
+    .marker-popup {
+        position: absolute;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        z-index: 100;
+        display: none;
+        min-width: 320px;
+        max-width: 400px;
+        transform: translateY(-100%);
+        margin-top: -10px;
+        border: 1px solid rgba(0,0,0,0.08);
+    }
+    
+    .map-mode-switch {
+        position: absolute;
+        top: 24px; /* 增加间距 */
+        left: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px; /* 增加圆角 */
+        padding: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 8px;
+        backdrop-filter: blur(8px);
+        z-index: 20;
+    }
+    
+    .map-mode-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .map-mode-btn.active {
+        background-color: #3498db;
+        color: white;
+        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    }
+    
+    .map-mode-btn:not(.active) {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+    
+    .map-mode-btn:not(.active):hover {
+        background-color: #e9ecef;
+    }
+    
+    .offline-map-controls {
+        position: absolute;
+        bottom: 24px; /* 增加间距 */
+        left: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px; /* 增加圆角 */
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        display: none;
+        backdrop-filter: blur(8px);
+        z-index: 20;
+        min-width: 160px;
+    }
+    
+    .offline-map-controls.show {
+        display: block;
+    }
+    
+    .offline-map-controls button {
+        display: block;
+        width: 100%;
+        margin: 6px 0;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        background-color: #f8f9fa;
+        color: #6c757d;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .offline-map-controls button:hover {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+    
+    .offline-map-controls button.active {
+        background-color: #3498db;
+        color: white;
+        box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    }
+    
+    .download-progress {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.95);
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        text-align: center;
+    }
+    
+    .download-progress.show {
+        display: block;
+    }
+    
+    .progress-bar {
+        width: 240px;
+        height: 8px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 16px 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background-color: #3498db;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-text {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+    
+    .progress-text:last-child {
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+    
+    .map-header {
+        margin-bottom: 24px;
+    }
+    
+    .map-header h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+    
+    .map-header p {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+
+    /* 调整容器布局 */
+    .container {
+        max-width: 1400px; /* 增加最大宽度 */
+        padding: 0 24px; /* 增加左右内边距 */
+    }
+
+    .map-controls {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 1000;
+    }
+    
+    .map-control-group {
+        display: flex;
+        flex-direction: column;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        backdrop-filter: blur(8px);
+    }
+    
+    .map-control-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        color: #3498db;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .map-control-btn:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 20%;
+        right: 20%;
+        height: 1px;
+        background: rgba(0,0,0,0.1);
+    }
+    
+    .map-control-btn:hover {
+        background: #3498db;
+        color: white;
+    }
+    
+    .map-control-btn.active {
+        background: #3498db;
+        color: white;
+    }
+    
+    .zoom-level {
+        position: absolute;
+        right: 50px;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #666;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .map-control-btn:hover .zoom-level {
+        opacity: 1;
+    }
+
+    /* 修改图层切换控件的样式 */
+    .leaflet-control-layers {
+        position: absolute !important;
+        bottom: 24px !important; /* 改为底部定位 */
+        left: 24px !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(8px);
+        padding: 8px !important;
+        z-index: 19 !important;
+    }
+
+    .leaflet-control-layers-toggle {
+        width: auto !important;
+        height: auto !important;
+        background-image: none !important;
+        padding: 8px 16px !important;
+        border-radius: 6px !important;
+        font-size: 14px !important;
+        color: #6c757d !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        background-color: transparent !important;
+    }
+
+    .leaflet-control-layers-toggle::before {
+        content: '切换地图';
+        display: inline-block;
+    }
+
+    .leaflet-control-layers-toggle:hover {
+        background-color: #e9ecef !important;
+    }
+
+    .leaflet-control-layers-expanded {
+        padding: 12px !important;
+        min-width: 200px !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+        position: absolute !important;
+        bottom: 100% !important; /* 向上展开 */
+        left: 0 !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .leaflet-control-layers {
+            bottom: 16px !important;
+            left: 16px !important;
+        }
+
+        .leaflet-control-layers-toggle {
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+        }
+
+        .leaflet-control-layers-expanded {
+            min-width: 180px !important;
+            padding: 10px !important;
+        }
+
+        .leaflet-control-layers label {
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+        }
+    }
+
+    .leaflet-control-layers-expanded .leaflet-control-layers-list {
+        margin: 0 !important;
+    }
+
+    .leaflet-control-layers label {
+        margin-bottom: 8px !important;
+        padding: 8px 12px !important;
+        border-radius: 6px !important;
+        transition: all 0.3s ease !important;
+        display: block !important;
+        cursor: pointer !important;
+    }
+
+    .leaflet-control-layers label:hover {
+        background-color: #f8f9fa !important;
+        color: #3498db !important;
+    }
+
+    .leaflet-control-layers label:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    /* 地图视图切换样式 */
+    .map-view {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    .map-view.active {
+        display: block;
+    }
+
+    /* 离线地图网格样式 */
+    .offline-map-grid {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(#e0e0e0 1px, transparent 1px),
+                         linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+        background-size: 50px 50px;
+        transform-origin: center;
+        opacity: 0.6;
+        transition: transform 0.3s ease;
+    }
+
+    /* 离线地图控制面板样式 */
+    .offline-controls {
+        position: absolute;
+        bottom: 24px;
+        left: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        backdrop-filter: blur(8px);
+        z-index: 20;
+    }
+
+    .offline-zoom-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .offline-zoom-controls button {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 8px;
+        background: #f8f9fa;
+        color: #6c757d;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .offline-zoom-controls button:hover {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    .offline-zoom-controls .scale {
+        font-size: 14px;
+        color: #6c757d;
+        min-width: 80px;
+        text-align: center;
+    }
+    
+    .offline-download-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .download-current-area {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        background: #3498db;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .download-current-area:hover {
+        background: #2980b9;
+    }
+
+    .download-progress {
+        display: none;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .download-progress.show {
+        display: block;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 8px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: #3498db;
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        font-size: 12px;
+        color: #6c757d;
+        text-align: center;
+    }
+
+    .progress-text:last-child {
+        font-weight: 500;
+    }
+
+    /* 离线地图样式修改 */
+    #offlineMap {
+        background: #f8f9fa;
+        position: relative;
+    }
+    
+    .offline-map-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .offline-map-content h3 {
+        margin-bottom: 16px;
+        color: #2c3e50;
+        font-size: 18px;
+    }
+    
+    .offline-map-content p {
+        color: #6c757d;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+    
+    .offline-map-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+    }
+    
+    .offline-map-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .offline-map-btn.primary {
+        background: #3498db;
+        color: white;
+    }
+    
+    .offline-map-btn.primary:hover {
+        background: #2980b9;
+    }
+    
+    .offline-map-btn.secondary {
+        background: #f8f9fa;
+        color: #6c757d;
+    }
+    
+    .offline-map-btn.secondary:hover {
+        background: #e9ecef;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1><i class="bi bi-map-fill"></i>安全地图</h1>
+        <p>查看周围安全设施位置，包括警察局、医院、使领馆等。实时定位和导航，确保您随时了解周边安全资源。</p>
+            </div>
+                </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div id="mapContainer">
+                <!-- 在线地图容器 -->
+                <div id="onlineMap" class="map-view active"></div>
+                
+                <!-- 离线地图容器 -->
+                <div id="offlineMap" class="map-view">
+                    <div class="offline-map-content">
+                        <h3>离线地图功能</h3>
+                        <p>该功能正在开发中，敬请期待...</p>
+            </div>
+        </div>
+        
+                <!-- 地图控制按钮 -->
+                <div class="map-controls">
+                    <div class="map-control-group">
+                        <button class="map-control-btn" id="locationBtn" title="定位当前位置">
+                            <i class="bi bi-geo-alt"></i>
+                            <span class="zoom-level">定位当前位置</span>
+                        </button>
+                        <button class="map-control-btn" id="followBtn" title="跟随模式">
+                            <i class="bi bi-record-circle"></i>
+                            <span class="zoom-level">开启跟随模式</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 地图模式切换 -->
+                <div class="map-mode-switch">
+                    <button class="map-mode-btn active" data-mode="online">在线地图</button>
+                    <button class="map-mode-btn" data-mode="offline">离线地图</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加 Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化地图
+    const map = L.map('onlineMap', {
+        center: [39.9042, 116.4074],
+        zoom: 13,
+        zoomControl: false,
+        doubleClickZoom: true,
+        touchZoom: true,
+        scrollWheelZoom: true,
+        maxZoom: 18,
+        minZoom: 3
+    });
+    
+    // 添加多个地图图层源
+    const gaodeNormal = L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+        subdomains: ["1", "2", "3", "4"],
+        maxZoom: 18,
+        minZoom: 3
+    });
+    
+    const gaodeSatellite = L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', {
+        subdomains: ["1", "2", "3", "4"],
+        maxZoom: 18,
+        minZoom: 3
+    });
+
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 3
+    });
+    
+    const googleNormal = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        minZoom: 3
+    });
+    
+    const googleSatellite = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        minZoom: 3
+    });
+
+    // 创建图层控制组
+    const baseMaps = {
+        "高德地图": gaodeNormal,
+        "高德卫星": gaodeSatellite,
+        "OpenStreetMap": osmLayer,
+        "谷歌地图": googleNormal,
+        "谷歌卫星": googleSatellite
+    };
+
+    // 添加图层切换控件
+    const layerControl = L.control.layers(baseMaps, null, {
+        position: 'bottomleft',
+        collapsed: true
+    }).addTo(map);
+
+    // 根据用户语言和位置选择默认地图源
+    if (navigator.language.includes('zh')) {
+        gaodeNormal.addTo(map);
+        gaodeNormal.on('tileerror', function(e) {
+            map.removeLayer(gaodeNormal);
+            osmLayer.addTo(map);
+        });
+    } else {
+        osmLayer.addTo(map);
+        osmLayer.on('tileerror', function(e) {
+            map.removeLayer(osmLayer);
+            googleNormal.addTo(map);
+        });
+    }
+
+    // 用户位置标记
+    let userMarker = null;
+    let userCircle = null;
+    let isFollowing = false;
+    
+    // 定位按钮点击事件
+    document.getElementById('locationBtn').addEventListener('click', function() {
+        this.classList.add('active');
+        
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+                
+                if (userMarker) {
+                    map.removeLayer(userMarker);
+                }
+                if (userCircle) {
+                    map.removeLayer(userCircle);
+                }
+                
+                userMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'location-marker user-marker',
+                        html: '<i class="bi bi-person-fill"></i>',
+                        iconSize: [40, 40]
+                    })
+                }).addTo(map);
+                
+                userCircle = L.circle([lat, lng], {
+                    radius: accuracy,
+                    color: '#3498db',
+                    fillColor: '#3498db',
+                    fillOpacity: 0.1
+                }).addTo(map);
+                
+                map.setView([lat, lng], 16);
+                
+                setTimeout(() => {
+                    document.getElementById('locationBtn').classList.remove('active');
+                }, 1000);
+            }, function(error) {
+                alert('无法获取位置信息：' + error.message);
+                document.getElementById('locationBtn').classList.remove('active');
+            }, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            });
+        } else {
+            alert('您的浏览器不支持地理定位功能');
+            this.classList.remove('active');
+        }
+    });
+    
+    // 跟随模式按钮点击事件
+    document.getElementById('followBtn').addEventListener('click', function() {
+        isFollowing = !isFollowing;
+        this.classList.toggle('active');
+        
+        if (isFollowing) {
+            const watchId = navigator.geolocation.watchPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+                
+                if (userMarker) {
+                    userMarker.setLatLng([lat, lng]);
+                    userCircle.setLatLng([lat, lng]);
+                    userCircle.setRadius(accuracy);
+                    map.setView([lat, lng], map.getZoom());
+                }
+            }, function(error) {
+                alert('位置监听失败：' + error.message);
+                isFollowing = false;
+                document.getElementById('followBtn').classList.remove('active');
+            }, {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            });
+            
+            this.dataset.watchId = watchId;
+        } else {
+            navigator.geolocation.clearWatch(Number(this.dataset.watchId));
+        }
+    });
+
+    // 地图视图切换
+    const onlineMap = document.getElementById('onlineMap');
+    const offlineMap = document.getElementById('offlineMap');
+    const modeButtons = document.querySelectorAll('.map-mode-btn');
+    
+    let currentMode = 'online';
+    
+    // 模式切换事件
+    modeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const mode = this.dataset.mode;
+            
+            // 移除所有按钮的激活状态
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            // 激活当前按钮
+            this.classList.add('active');
+            
+            // 切换地图视图
+            if (mode === 'offline') {
+                onlineMap.classList.remove('active');
+                offlineMap.classList.add('active');
+            } else {
+                offlineMap.classList.remove('active');
+                onlineMap.classList.add('active');
+            }
+            
+            currentMode = mode;
+        });
+    });
+});
+</script>
+{% endblock %} 
