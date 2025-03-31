@@ -165,7 +165,16 @@ def admin_export_users():
 log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'logs')
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
-file_handler = RotatingFileHandler(os.path.join(log_dir, 'app.log'), maxBytes=10240, backupCount=10)
+
+# 设置日志处理器
+file_handler = RotatingFileHandler(
+    os.path.join(log_dir, 'app.log'),
+    maxBytes=10240,
+    backupCount=10,
+    encoding='utf-8'
+)
+
+# 设置日志格式
 file_handler.setFormatter(logging.Formatter(
     '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
 ))
@@ -173,6 +182,68 @@ file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('海外安全助手应用启动')
+
+# 确保模板目录存在
+template_dirs = [
+    os.path.join(app.root_path, 'templates', 'admin'),
+    os.path.join(app.root_path, 'templates', 'errors')
+]
+for dir_path in template_dirs:
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+# 创建错误处理模板
+error_templates = {
+    '404.html': '''
+{% extends "base.html" %}
+{% block title %}页面未找到 - 海外安全助手{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">404</h1>
+            <h2>页面未找到</h2>
+            <p>抱歉，您访问的页面不存在。</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">返回首页</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+''',
+    '500.html': '''
+{% extends "base.html" %}
+{% block title %}服务器错误 - 海外安全助手{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">500</h1>
+            <h2>服务器错误</h2>
+            <p>抱歉，服务器发生了错误。请稍后再试。</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">返回首页</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+'''
+}
+
+# 创建错误模板文件
+for template_name, content in error_templates.items():
+    template_path = os.path.join(app.root_path, 'templates', 'errors', template_name)
+    if not os.path.exists(template_path):
+        with open(template_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+# 错误处理路由
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    app.logger.error(f'服务器错误: {str(error)}', exc_info=True)
+    return render_template('errors/500.html'), 500
 
 # 处理favicon.ico请求
 @app.route('/favicon.ico')
@@ -187,17 +258,6 @@ def index():
     username = session.get('username', '')
     update_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     return render_template('index.html', logged_in=logged_in, username=username, update_time=update_time)
-
-# 全局错误处理
-@app.errorhandler(404)
-def not_found_error(error):
-    app.logger.error(f'页面未找到: {request.url}')
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_error(error):
-    app.logger.error(f'服务器错误: {error}', exc_info=True)
-    return render_template('500.html'), 500
 
 # 初始化用户数据文件
 if not os.path.exists('data'):

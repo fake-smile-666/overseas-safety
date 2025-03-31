@@ -1,0 +1,15 @@
+
+{% extends "base.html" %}
+{% block title %}服务器错误 - 海外安全助手{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">500</h1>
+            <h2>服务器错误</h2>
+            <p>抱歉，服务器发生了错误。请稍后再试。</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">返回首页</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
