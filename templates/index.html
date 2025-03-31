@@ -5,10 +5,24 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <!-- 在顶部添加更新时间显示 -->
-        <div class="alert alert-info mb-3">
-            <small class="text-muted">最后更新时间：{{ update_time }}</small>
-        </div>
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4 rounded">
+            <div class="container-fluid">
+                <span class="navbar-text">
+                    <small class="text-muted">最后更新时间：{{ update_time }}</small>
+                </span>
+                <ul class="navbar-nav ms-auto">
+                    {% if not logged_in %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('admin_login') }}" class="nav-link">
+                            <i class="bi bi-shield-lock"></i>
+                            管理员入口
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
         
         {% if not logged_in %}
         <!-- 未登录用户显示欢迎页面 -->
