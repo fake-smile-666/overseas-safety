@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}管理员登录 - 海外安全助手{% endblock %}
 
@@ -34,6 +34,11 @@
                         </div>
                         <button type="submit" class="btn btn-primary w-100">登录</button>
                     </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('index') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> 返回首页
+                    </a>
                 </div>
             </div>
         </div>
